@@ -7,6 +7,8 @@ type SquareProps = {
   onClick: () => void;
 };
 
+type BoardProps = { squares: string[]; onClick: (i: number) => void };
+
 const Square = (props: SquareProps) => {
   return (
     <button className="square" onClick={() => props.onClick()}>
@@ -15,10 +17,49 @@ const Square = (props: SquareProps) => {
   );
 };
 
-const Board = () => {
+const Board = (props: BoardProps) => {
+  return (
+    <div>
+      {/* <div className="status">{status}</div> */}
+      <div className="board-row">
+        <Square value={props.squares[0]} onClick={() => props.onClick(0)} />
+        <Square value={props.squares[1]} onClick={() => props.onClick(1)} />
+        <Square value={props.squares[2]} onClick={() => props.onClick(2)} />
+      </div>
+      <div className="board-row">
+        <Square value={props.squares[3]} onClick={() => props.onClick(3)} />
+        <Square value={props.squares[4]} onClick={() => props.onClick(4)} />
+        <Square value={props.squares[5]} onClick={() => props.onClick(5)} />
+      </div>
+      <div className="board-row">
+        <Square value={props.squares[6]} onClick={() => props.onClick(6)} />
+        <Square value={props.squares[7]} onClick={() => props.onClick(7)} />
+        <Square value={props.squares[8]} onClick={() => props.onClick(8)} />
+      </div>
+    </div>
+  );
+};
+
+const Game = () => {
+  const [history, setHistory] = useState([
+    {
+      squares: Array<string>(9).fill(""),
+    },
+  ]);
   const [xIsNext, setTurn] = useState(true);
-  const [squares, setSquares] = useState(Array<string>(9).fill(""));
-  const winner = calculateWinner(squares);
+  const [stepNumber, setStepNumber] = useState(0);
+  const current = history[stepNumber];
+  const winner = calculateWinner(current.squares);
+
+  const moves = history.map((step, move) => {
+    const desc = move ? "Go to move #" + move : "Go to game start";
+    return (
+      <li key={move}>
+        <button onClick={() => jumpTo(move)}>{desc}</button>
+      </li>
+    );
+  });
+
   let status: string;
   if (winner) {
     status = "Winner: " + winner;
@@ -27,44 +68,34 @@ const Board = () => {
   }
 
   const handleClick = (i: number) => {
-    const updatedSquares = [...squares];
-    if (calculateWinner(updatedSquares) || squares[i]) {
+    const gameHistory = history.slice(0, stepNumber + 1);
+    const updatedSquares = [...current.squares];
+    if (calculateWinner(updatedSquares) || current.squares[i]) {
       return;
     }
     updatedSquares[i] = xIsNext ? "X" : "O";
-    setSquares((squares) => updatedSquares);
+    setHistory((history) => gameHistory.concat([{ squares: updatedSquares }]));
+    setStepNumber(() => gameHistory.length);
     setTurn((xIsNext) => !xIsNext);
   };
 
-  return (
-    <div>
-      <div className="status">{status}</div>
-      <div className="board-row">
-        <Square value={squares[0]} onClick={() => handleClick(0)} />
-        <Square value={squares[1]} onClick={() => handleClick(1)} />
-        <Square value={squares[2]} onClick={() => handleClick(2)} />
-      </div>
-      <div className="board-row">
-        <Square value={squares[3]} onClick={() => handleClick(3)} />
-        <Square value={squares[4]} onClick={() => handleClick(4)} />
-        <Square value={squares[5]} onClick={() => handleClick(5)} />
-      </div>
-      <div className="board-row">
-        <Square value={squares[6]} onClick={() => handleClick(6)} />
-        <Square value={squares[7]} onClick={() => handleClick(7)} />
-        <Square value={squares[8]} onClick={() => handleClick(8)} />
-      </div>
-    </div>
-  );
-};
+  const jumpTo = (step: number) => {
+    setStepNumber(() => step);
+    setTurn(() => step % 2 === 0);
+  };
 
-const Game = () => {
   return (
     <div className="game">
       <div className="game-board">
-        <Board />
+        <Board
+          squares={current.squares}
+          onClick={(i: number) => handleClick(i)}
+        />
       </div>
-      <div className="game-info">{/*  status */}</div>
+      <div className="game-info">
+        <div>{status}</div>
+        <div>{moves}</div>
+      </div>
     </div>
   );
 };
