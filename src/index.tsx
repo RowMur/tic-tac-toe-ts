@@ -16,14 +16,24 @@ const Square = (props: SquareProps) => {
 };
 
 const Board = () => {
-  const status: string = "Next player: X";
+  const [xIsNext, setTurn] = useState(true);
   const [squares, setSquares] = useState(Array<string>(9).fill(""));
+  const winner = calculateWinner(squares);
+  let status: string;
+  if (winner) {
+    status = "Winner: " + winner;
+  } else {
+    status = "Next player: " + (xIsNext ? "X" : "O");
+  }
 
   const handleClick = (i: number) => {
-    console.log("Click");
     const updatedSquares = [...squares];
-    updatedSquares[i] = "X";
+    if (calculateWinner(updatedSquares) || squares[i]) {
+      return;
+    }
+    updatedSquares[i] = xIsNext ? "X" : "O";
     setSquares((squares) => updatedSquares);
+    setTurn((xIsNext) => !xIsNext);
   };
 
   return (
@@ -58,6 +68,26 @@ const Game = () => {
     </div>
   );
 };
+
+function calculateWinner(squares: string[]) {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return squares[a];
+    }
+  }
+  return null;
+}
 
 const root = ReactDOM.createRoot(document.getElementById("root")!);
 root.render(<Game />);
