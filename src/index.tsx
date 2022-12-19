@@ -1,3 +1,4 @@
+import { printIntrospectionSchema } from "graphql";
 import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
@@ -18,25 +19,26 @@ const Square = (props: SquareProps) => {
 };
 
 const Board = (props: BoardProps) => {
-  return (
-    <div>
-      <div className="board-row">
-        <Square value={props.squares[6]} onClick={() => props.onClick(6)} />
-        <Square value={props.squares[7]} onClick={() => props.onClick(7)} />
-        <Square value={props.squares[8]} onClick={() => props.onClick(8)} />
-      </div>
-      <div className="board-row">
-        <Square value={props.squares[3]} onClick={() => props.onClick(3)} />
-        <Square value={props.squares[4]} onClick={() => props.onClick(4)} />
-        <Square value={props.squares[5]} onClick={() => props.onClick(5)} />
-      </div>
-      <div className="board-row">
-        <Square value={props.squares[0]} onClick={() => props.onClick(0)} />
-        <Square value={props.squares[1]} onClick={() => props.onClick(1)} />
-        <Square value={props.squares[2]} onClick={() => props.onClick(2)} />
-      </div>
-    </div>
-  );
+  const GenerateRow = (i: number) => {
+    let row = [];
+    for (let n = 0; n < 3; n++) {
+      const val = 3 * i + n;
+      row.push(
+        <Square value={props.squares[val]} onClick={() => props.onClick(val)} />
+      );
+    }
+    return row;
+  };
+
+  const GenerateBoard = () => {
+    let Board = [];
+    for (let i = 0; i < 3; i++) {
+      Board.push(<div className="board-row">{GenerateRow(i)}</div>);
+    }
+    return Board;
+  };
+
+  return <div>{GenerateBoard()}</div>;
 };
 
 const Game = () => {
