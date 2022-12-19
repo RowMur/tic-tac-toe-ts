@@ -20,7 +20,6 @@ const Square = (props: SquareProps) => {
 const Board = (props: BoardProps) => {
   return (
     <div>
-      {/* <div className="status">{status}</div> */}
       <div className="board-row">
         <Square value={props.squares[6]} onClick={() => props.onClick(6)} />
         <Square value={props.squares[7]} onClick={() => props.onClick(7)} />
@@ -66,7 +65,16 @@ const Game = () => {
           </p>
         )}
         <li key={move}>
-          <button onClick={() => jumpTo(move)}>{desc}</button>
+          <button
+            onClick={() => jumpTo(move)}
+            style={
+              stepNumber === move
+                ? { backgroundColor: "#ADD8E6" }
+                : { backgroundColor: "#fff" }
+            }
+          >
+            {desc}
+          </button>
         </li>
       </div>
     );
