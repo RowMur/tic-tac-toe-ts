@@ -49,7 +49,7 @@ const Game = () => {
       prev.concat([{ squares: updatedSquares, lastMove: i.toString() }])
     );
 
-    setStepNumber(() => history.length);
+    setStepNumber(history.length);
 
     setIsX((isX) => !isX);
   };
