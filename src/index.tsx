@@ -1,103 +1,23 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import ReactDOM from "react-dom/client";
+import Board from "./components/Board";
+
 import "./index.css";
-
-type SquareProps = {
-  value: string;
-  onClick: () => void;
-  style: { backgroundColor: any };
-};
-
-type BoardProps = {
-  squares: string[];
-  onClick: (i: number) => void;
-  winningSquares: number[] | null;
-};
-
-const Square = (props: SquareProps) => {
-  return (
-    <button
-      className="square"
-      onClick={() => props.onClick()}
-      style={props.style}
-    >
-      {props.value}
-    </button>
-  );
-};
-
-const Board = (props: BoardProps) => {
-  const GenerateRow = (i: number) => {
-    let row = [];
-    for (let n = 0; n < 3; n++) {
-      const val = 3 * i + n;
-      row.push(
-        <Square
-          value={props.squares[val]}
-          onClick={() => props.onClick(val)}
-          style={{
-            backgroundColor: props.winningSquares?.includes(val)
-              ? "#ADD8E6"
-              : {},
-          }}
-        />
-      );
-    }
-    return row;
-  };
-
-  const GenerateBoard = () => {
-    let Board = [];
-    for (let i = 0; i < 3; i++) {
-      Board.push(<div className="board-row">{GenerateRow(i)}</div>);
-    }
-    return Board;
-  };
-
-  return <div>{GenerateBoard()}</div>;
-};
 
 const Game = () => {
   const [history, setHistory] = useState([
     {
-      squares: Array<string>(9).fill(""),
+      squares: Array<"X" | "O" | "">(9).fill(""),
       lastMove: "",
     },
   ]);
+
   const [xIsNext, setTurn] = useState(true);
   const [stepNumber, setStepNumber] = useState(0);
   const current = history[stepNumber];
 
   const [reversed, setReversed] = useState(false);
 
-  const moves = history.map((step, move: number) => {
-    const desc = move ? "Go to move #" + move : "Go to game start";
-
-    const xCoord = +step.lastMove % 3;
-    const yCoord = (+step.lastMove - xCoord) / 3;
-
-    return (
-      <div className="moveList">
-        <li key={move}>
-          <button
-            onClick={() => jumpTo(move)}
-            style={
-              stepNumber === move
-                ? { backgroundColor: "#ADD8E6" }
-                : { backgroundColor: "#fff" }
-            }
-          >
-            {desc}
-          </button>
-        </li>
-        {move === 0 ? null : (
-          <p>
-            ({xCoord},{yCoord})
-          </p>
-        )}
-      </div>
-    );
-  });
   let status: string = "Next player: X";
   const winning = calculateWinner(current.squares);
   if (winning) {
@@ -120,7 +40,7 @@ const Game = () => {
       return;
     }
     updatedSquares[i] = xIsNext ? "X" : "O";
-    setHistory((history) =>
+    setHistory(() =>
       gameHistory.concat([{ squares: updatedSquares, lastMove: i.toString() }])
     );
     setStepNumber(() => gameHistory.length);
@@ -161,7 +81,7 @@ const Game = () => {
       <div className="game-board">
         <Board
           squares={current.squares}
-          onClick={(i: number) => handleClick(i)}
+          onClick={(i) => handleClick(i)}
           winningSquares={winning}
         />
       </div>
@@ -176,7 +96,34 @@ const Game = () => {
             flexDirection: reversed ? "column-reverse" : "column",
           }}
         >
-          {moves}
+          {history.map((step, move) => {
+            const desc = move ? "Go to move #" + move : "Go to game start";
+
+            const xCoord = parseInt(step.lastMove) % 3;
+            const yCoord = (parseInt(step.lastMove) - xCoord) / 3;
+
+            return (
+              <div className="moveList">
+                <li key={move}>
+                  <button
+                    onClick={() => jumpTo(move)}
+                    style={
+                      stepNumber === move
+                        ? { backgroundColor: "#ADD8E6" }
+                        : { backgroundColor: "#fff" }
+                    }
+                  >
+                    {desc}
+                  </button>
+                </li>
+                {move === 0 ? null : (
+                  <p>
+                    ({xCoord},{yCoord})
+                  </p>
+                )}
+              </div>
+            );
+          })}
         </ol>
       </div>
     </div>
