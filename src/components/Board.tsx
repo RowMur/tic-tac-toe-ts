@@ -22,7 +22,7 @@ const Board = (props: BoardProps) => {
                   style={{
                     backgroundColor: props.winningSquares?.includes(3 * i + j)
                       ? "#ADD8E6"
-                      : {},
+                      : "#ffffff",
                   }}
                 />
               ))}
